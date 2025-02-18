@@ -104,6 +104,12 @@ bool SD_Init(int cs) {
   return(true);
 }
 
+// Function to dispense Soda
+//
+bool dispenseSoda() {
+  // Put code here to drive motor and dispense soda
+  return(true);
+}
 
 // Perform Actions for Vending State
 void StateVending() {
@@ -126,12 +132,14 @@ void StateVending() {
  
   // Print to screen
   // String tempText = "Vending State";
+
+  // Call Function to dispense Soda
+  //
+    dispenseSoda();
+
   // tft.drawCentreString(tempText, centerX, textY, FONT_SIZE);
 
-    PlayGIF(gifFiles[gifIndex]); // Play GIF off of SD card
-  
-  // Simulate Vending with Delay
-  delay(5000);
+    PlayGIF(gifFiles[gifIndex], 5); // Play GIF off of SD card for 5 seconds
   
   // Vending is complete - Set State to Active 
   StateActive();
@@ -274,7 +282,9 @@ void loop() {
 // ======================================================
 // BEGIN - GIF Support Functions
 //
-bool PlayGIF(String gifFile) {
+bool PlayGIF(String gifFile, int seconds) {
+  time_t startTime = now();
+
   AnimateGIF = true;
   while (AnimateGIF) {
     if (gif.open(gifFile.c_str(), fileOpen, fileClose, fileRead, fileSeek, GIFDraw)) {
@@ -287,11 +297,14 @@ bool PlayGIF(String gifFile) {
         yield();
       }
       gif.close();
-      return(true);
     } else {
       Serial.print("FAIL gif.open: ");
       Serial.println(gifFile.c_str());
       return (false);
+    }
+    if ((second(now()) - second(startTime)) >= seconds) {
+      AnimateGIF = false;
+      return(true);
     }
   }
 }
